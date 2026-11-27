@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- CUSTOMIZE: page title and description -->
+<title>Diagnosing &amp; Fixing Custom Domain Email Delivery Issues (SPF, DKIM, DMARC)</title>
+<meta name="description" content="A troubleshooting runbook and onboarding job aid for SPF, DKIM, and DMARC problems.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/guide.css">
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<div class="layout">
+
+<nav class="toc" aria-label="On this page">
+  <p><a href="index.html">Back to portfolio</a></p>
+  <p>On this page</p>
+  <ol>
+    <li><a href="#outcome">Outcome &amp; when to use</a></li>
+    <li><a href="#concepts">How it fits together</a></li>
+    <li><a href="#workflow">Diagnostic workflow</a></li>
+    <li><a href="#lab">Record checker</a></li>
+    <li><a href="#quickref">Quick-reference checklist</a></li>
+    <li><a href="#quiz">Knowledge check</a></li>
+  </ol>
+  <div class="progress" aria-live="polite">
+    Workflow progress: <span id="pct">0%</span>
+    <div class="bar"><i id="barfill"></i></div>
+  </div>
+  <button id="theme" type="button" aria-pressed="false">Switch theme</button>
+</nav>
+
+<main id="main">
+<header>
+  <!-- CUSTOMIZE: title, audience, times -->
+  <h1>Diagnosing &amp; Fixing Custom Domain Email Delivery Issues</h1>
+  <p class="lede">A runbook for finding out why mail from a custom domain bounces or lands in spam, using SPF, DKIM, and DMARC.</p>
+  <dl class="meta">
+    <div><dt>Audience</dt><dd>New support specialists, support engineers</dd></div>
+    <div><dt>Read time</dt><dd>10 minutes</dd></div>
+    <div><dt>Practice time</dt><dd>15 minutes in a sandbox</dd></div>
+    <div><dt>Scenario</dt><dd>example.com (fictional)</dd></div>
+  </dl>
+</header>
+
+<section id="outcome">
+  <h2>Outcome and when to use this guide</h2>
+  <p>After this guide you can verify a domain's email DNS records, spot common syntax and alignment mistakes, and resolve bounced or spam-filtered mail.</p>
+  <div class="two">
+    <div class="box"><h3>Use this guide when</h3>
+      <ul class="tight">
+        <li>A customer's mail bounces with an authentication error.</li>
+        <li>Mail from their domain lands in spam.</li>
+        <li>They just changed email providers or DNS hosts.</li>
+      </ul></div>
+    <div class="box"><h3>Escalate instead when</h3>
+      <ul class="tight">
+        <li>Records are correct but delivery still fails.</li>
+        <li>The sending IP appears on a blocklist.</li>
+        <li>The customer asks you to change DNS you cannot access.</li>
+      </ul></div>
+  </div>
+</section>
+
+<section id="concepts">
+  <h2>How DNS, mail servers, and authentication fit together</h2>
+  <p>A receiving mail server doesn't trust the "From" address on its own. It looks up three kinds of DNS records on the sender's domain to decide whether the message is real.</p>
+  <div class="flow" aria-label="Mail flow">
+    <span>Sender's mail server</span><b>sends to</b><span>Receiving server</span><b>looks up</b><span>DNS for example.com</span><b>then</b><span>Inbox, spam, or reject</span>
+  </div>
+  <div class="two">
+    <div class="box"><h3>SPF</h3><p>Lists which servers may send mail for the domain. Stored as a TXT record on the domain itself.</p></div>
+    <div class="box"><h3>DKIM</h3><p>Adds a signature to each message. The public key sits in a TXT record at <code>selector._domainkey</code>.</p></div>
+    <div class="box"><h3>DMARC</h3><p>Tells receivers what to do when SPF or DKIM fails, and requires the results to match the visible From domain (alignment). Stored at <code>_dmarc</code>.</p></div>
+  </div>
+</section>
+
+<section id="workflow">
+  <h2>Step-by-step diagnostic workflow</h2>
+  <p>Tick each step as you finish it. Your progress is saved in this browser.</p>
+  <ol class="steps" id="steps">
+    <li>
+      <h3>Get the failure details</h3>
+      <p>Ask for the full bounce message or the message headers. Note the sending domain, the error code, and the <code>Authentication-Results</code> line.</p>
+      <label><input type="checkbox"> Done</label>
+    </li>
+    <li>
+      <h3>Check that each record exists</h3>
+      <p>Query all three records. Replace <code>selector1</code> with the selector from the message headers (<code>s=</code> in the DKIM-Signature).</p>
+<pre><code>dig +short TXT example.com
+dig +short TXT selector1._domainkey.example.com
+dig +short TXT _dmarc.example.com</code></pre>
+      <div class="callout pit"><strong>Common pitfall: wrong selector</strong><p>A typo in the selector returns nothing, which looks like a missing record. Copy the selector from the headers instead of typing it.</p></div>
+      <label><input type="checkbox"> Done</label>
+    </li>
+    <li>
+      <h3>Check propagation</h3>
+      <p>If the customer changed DNS recently, query the authoritative name servers directly and compare with a public resolver.</p>
+<pre><code>dig +short NS example.com
+dig +short TXT example.com @ns1.example-dns.net
+dig +short TXT example.com @1.1.1.1</code></pre>
+      <p>If the answers differ, wait for the record's TTL to pass, then test again.</p>
+      <label><input type="checkbox"> Done</label>
+    </li>
+    <li>
+      <h3>Validate syntax</h3>
+      <p>Paste each record into the checker below. Look for these errors first.</p>
+      <div class="callout pit"><strong>Common pitfall: multiple SPF records</strong><p>A domain can have only one SPF record. If a second provider told the customer to "add" a record, merge the <code>include:</code> entries into one.</p></div>
+      <div class="callout pit"><strong>Common pitfall: too many lookups</strong><p>SPF allows 10 DNS lookups. Each <code>include</code>, <code>a</code>, <code>mx</code>, and <code>redirect</code> counts.</p></div>
+      <label><input type="checkbox"> Done</label>
+    </li>
+    <li>
+      <h3>Verify alignment</h3>
+      <p>DMARC passes only if SPF or DKIM passes <em>and</em> its domain matches the visible From domain. Compare the From domain to the <code>d=</code> value in the DKIM signature and the Return-Path domain.</p>
+      <div class="callout pit"><strong>Common pitfall: overlooked subdomains</strong><p>Mail sent from <code>news.example.com</code> needs its own SPF and DKIM setup unless the DMARC policy and alignment mode cover it. Check which exact domain sends.</p></div>
+      <label><input type="checkbox"> Done</label>
+    </li>
+    <li>
+      <h3>Apply the fix, then confirm</h3>
+      <p>Ask the customer to update the record, wait for the TTL, then send a test message to a mailbox you can read. Open the headers and confirm SPF, DKIM, and DMARC all show <code>pass</code>.</p>
+      <label><input type="checkbox"> Done</label>
+    </li>
+    <li>
+      <h3>Escalate or close</h3>
+      <div class="callout esc"><strong>Escalation criteria</strong><p>Escalate if all three records pass but mail is still rejected, the sending IP is blocklisted, DKIM fails with a correct record (possible key rotation issue at the provider), or the customer reports a suspected spoofing attack.</p></div>
+      <p>Otherwise, document the cause and the fix in the ticket and close it.</p>
+      <label><input type="checkbox"> Done</label>
+    </li>
+  </ol>
+</section>
+
+<section id="lab">
+  <h2>Record checker</h2>
+  <p>Paste a record or load a sample. The checker spots common mistakes locally in your browser. It does not query live DNS.</p>
+  <div class="lab">
+    <label for="rec">DNS TXT record value</label>
+    <textarea id="rec" spellcheck="false" placeholder="v=spf1 include:_spf.mailhost.example ~all"></textarea>
+    <div class="chips" role="group" aria-label="Load a sample">
+      <button class="chip" type="button" data-s="spf-ok">Valid SPF</button>
+      <button class="chip" type="button" data-s="spf-dup">Two SPF records</button>
+      <button class="chip" type="button" data-s="spf-all">SPF with +all</button>
+      <button class="chip" type="button" data-s="dmarc-bad">DMARC missing policy</button>
+      <button class="chip" type="button" data-s="dkim-ok">Valid DKIM</button>
+    </div>
+    <button class="btn" type="button" id="run">Check record</button>
+    <ul id="lintOut" aria-live="polite"></ul>
+  </div>
+</section>
+
+<section id="quickref">
+  <h2>Onboarding quick-reference checklist</h2>
+  <p>Use during practice tickets or QA calibration. A reviewer can mark each item as seen in the ticket notes.</p>
+  <ul class="check" id="qr">
+    <li><label><input type="checkbox"> Asked for headers or the full bounce message</label></li>
+    <li><label><input type="checkbox"> Queried SPF, DKIM (with the right selector), and DMARC</label></li>
+    <li><label><input type="checkbox"> Confirmed only one SPF record and 10 or fewer lookups</label></li>
+    <li><label><input type="checkbox"> Compared From, DKIM <code>d=</code>, and Return-Path domains</label></li>
+    <li><label><input type="checkbox"> Verified the fix with a test message and header check</label></li>
+    <li><label><input type="checkbox"> Applied escalation criteria and wrote clear ticket notes</label></li>
+  </ul>
+</section>
+
+<section id="quiz">
+  <h2>Knowledge check</h2>
+  <div id="quizBox"></div>
+  <button class="btn" type="button" id="grade">Check answers</button>
+  <p id="score" role="status"></p>
+</section>
+
+<footer>
+  <!-- CUSTOMIZE: your name, contact, links -->
+  <p>Written by <strong>Jorge Gomez</strong>. Scenario uses the reserved example domain; no real customer data. <a href="mailto:you@example.com">Contact</a></p>
+</footer>
+</main>
+</div>
+
+<script src="js/guide.js"></script>
+</body>
+</html>

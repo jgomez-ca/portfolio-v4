@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- CUSTOMIZE: title and description -->
+<title>Jorge Gomez | Technical Trainer, Enablement &amp; Documentation</title>
+<meta name="description" content="Portfolio of Jorge Gomez: technical training, customer enablement, and knowledge base documentation for DNS, domains, and email.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="top"><div class="wrap">
+  <a class="brand" href="#top">Jorge Gomez</a>
+  <nav aria-label="Main"><ul>
+    <li><a href="#featured">Featured</a></li>
+    <li><a href="#skills">What I do</a></li>
+    <li><a href="#about">About</a></li>
+    <li><a href="#work">Earlier work</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ul></nav>
+  <button id="theme" type="button" aria-pressed="false">Switch theme</button>
+</div></header>
+
+<main id="main">
+<div class="wrap hero" id="top">
+  <div>
+    <h1>I teach people how email and DNS work, and write the docs that keep them unstuck.</h1>
+    <p class="lede">Technical trainer, customer enablement specialist, and knowledge base writer with a background in domains, DNS, and design.</p>
+    <div class="btns">
+      <a class="btn" href="guide.html">Read the DNS &amp; email guide</a>
+      <a class="btn ghost" href="#contact">Get in touch</a>
+    </div>
+  </div>
+  <pre class="term" aria-label="Example DNS lookup"><span class="c"># Does the domain have an SPF record?</span>
+$ dig +short TXT example.com
+<span class="ok">"v=spf1 include:_spf.mailhost.example ~all"</span>
+
+<span class="c"># And DMARC?</span>
+$ dig +short TXT _dmarc.example.com
+<span class="ok">"v=DMARC1; p=none; rua=mailto:reports@example.com"</span></pre>
+</div>
+
+<section class="alt" id="featured"><div class="wrap">
+  <h2>Featured work</h2>
+  <div class="feature">
+    <div>
+      <h3>Diagnosing &amp; Fixing Custom Domain Email Delivery Issues</h3>
+      <p>A runbook and onboarding job aid for SPF, DKIM, and DMARC problems. It includes a step-by-step workflow, an interactive record checker, a quick-reference checklist, and a three-question knowledge check.</p>
+      <p><span class="tag">Knowledge base</span><span class="tag">Onboarding</span><span class="tag">Troubleshooting</span></p>
+      <p><a class="btn" href="guide.html">Open the guide</a></p>
+    </div>
+    <div class="card">
+      <h3>What it shows</h3>
+      <p>Clear, action-first documentation, training structure with a built-in practice check, and escalation criteria new specialists can follow.</p>
+    </div>
+  </div>
+  <h3 style="margin-top:2.5rem">More samples (in progress)</h3>
+  <div class="grid" style="margin-top:.75rem">
+    <!-- CUSTOMIZE: replace with real links when each sample is ready -->
+    <div class="card"><h3>Knowledge base article rewrite</h3><p>Before and after of a long article, with the reasoning behind each change.</p></div>
+    <div class="card"><h3>Training session outline</h3><p>A 45-minute live session plan with objectives, demo script, and exercises.</p></div>
+    <div class="card"><h3>Customer onboarding checklist</h3><p>A first-week enablement plan for a new domain and email customer.</p></div>
+  </div>
+</div></section>
+
+<section id="skills"><div class="wrap">
+  <h2>What I do</h2>
+  <div class="grid">
+    <div class="card"><h3>Technical training</h3><p>Plan and deliver sessions that move new specialists from theory to working through a real ticket.</p></div>
+    <div class="card"><h3>Customer enablement</h3><p>Turn product and DNS knowledge into guides, checklists, and walkthroughs customers can use on their own.</p></div>
+    <div class="card"><h3>Knowledge base writing</h3><p>Write and restructure articles so the answer comes first, steps are numbered, and pitfalls are called out.</p></div>
+    <div class="card"><h3>Documentation systems</h3><p>Organize content so it is easy to find, easy to update, and consistent in voice and format.</p></div>
+  </div>
+  <p style="margin-top:1.25rem"><span class="tag">DNS</span><span class="tag">SPF / DKIM / DMARC</span><span class="tag">Domain management</span><span class="tag">HTML &amp; CSS</span><span class="tag">JavaScript</span><span class="tag">Visual design</span></p>
+</div></section>
+
+<section class="alt" id="about"><div class="wrap about">
+  <img src="https://jgomez-ca.github.io/portfolio-v3/assets/img/profile.png" alt="Portrait of Jorge Gomez" width="224" height="224">
+  <div>
+    <h2>About me</h2>
+    <!-- CUSTOMIZE: add your own story, years of experience, and employers -->
+    <p>I'm a designer and developer with expertise in DNS, domain systems, and front-end technologies. I'm now focused on teaching and documenting technical topics.</p>
+    <p>My background in architecture and design shapes how I explain things: start with the structure, show how the parts connect, then give people a path they can follow. Photography taught me to leave out whatever doesn't help the picture.</p>
+  </div>
+</div></section>
+
+<section id="work"><div class="wrap">
+  <h2>Earlier work</h2>
+  <p>Design, web, and photography projects from my previous portfolio. Select an image to enlarge it.</p>
+  <div class="filters" role="group" aria-label="Filter projects">
+    <button type="button" data-f="All" aria-pressed="true">All</button>
+    <button type="button" data-f="Web" aria-pressed="false">Web</button>
+    <button type="button" data-f="Design" aria-pressed="false">Design</button>
+    <button type="button" data-f="Photography" aria-pressed="false">Photography</button>
+  </div>
+  <div class="gal" id="gal"></div>
+  <dialog id="lb" aria-label="Enlarged image">
+    <form method="dialog"><button class="btn x">Close</button></form>
+    <img id="lbimg" src="" alt="">
+  </dialog>
+</div></section>
+
+<section class="alt" id="contact"><div class="wrap">
+  <h2>Contact</h2>
+  <!-- CUSTOMIZE: add your email -->
+  <p>Open to technical trainer, customer enablement, and documentation roles. The best way to reach me is LinkedIn.</p>
+  <ul class="links">
+    <li><a href="https://www.linkedin.com/in/jgomezt">LinkedIn</a></li>
+    <li><a href="https://github.com/jgomez-ca">GitHub</a></li>
+    <li><a href="https://www.flickr.com/photos/jgomezt/albums">Flickr</a></li>
+    <li><a href="https://www.instagram.com/jgomezt/">Instagram</a></li>
+    <li><a href="https://pinterest.com/jogomezt">Pinterest</a></li>
+    <li><a href="https://soundcloud.com/jorge-gomez-124933477">SoundCloud</a></li>
+    <li><a href="https://www.youtube.com/@jgomezt/videos">YouTube</a></li>
+  </ul>
+</div></section>
+</main>
+
+<footer><div class="wrap">&copy; <span id="yr"></span> Jorge Gomez</div></footer>
+<script src="js/main.js"></script>
+</body>
+</html>
