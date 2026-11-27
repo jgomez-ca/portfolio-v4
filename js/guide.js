@@ -1,4 +1,3 @@
-
 // ---------- Theme ----------
 (function(){
   var btn=document.getElementById('theme'),root=document.documentElement;

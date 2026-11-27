@@ -1,3 +1,4 @@
+
 :root{
   --bg:#f4f6f9; --surface:#ffffff; --ink:#14213d; --muted:#51607a; --line:#d5dbe5;
   --accent:#0f6e66; --accent-soft:#dff3f0;
@@ -34,6 +35,8 @@ a{color:var(--accent)}
 :focus-visible{outline:3px solid var(--accent);outline-offset:2px;border-radius:4px}
 .skip{position:absolute;left:-999px;top:0;background:var(--accent);color:#fff;padding:.5rem 1rem}
 .skip:focus{left:0;z-index:10}
+.sitebar{display:flex;justify-content:space-between;gap:1rem;max-width:72rem;margin:0 auto;padding:1rem 1.25rem 0;font-weight:700}
+.sitebar a{text-decoration:none}
 .layout{display:grid;grid-template-columns:15rem minmax(0,1fr);gap:3rem;max-width:72rem;margin:0 auto;padding:2rem 1.25rem 5rem}
 nav.toc{position:sticky;top:1.5rem;align-self:start;font-size:.95rem}
 nav.toc p{margin:0 0 .5rem;font-weight:700}
